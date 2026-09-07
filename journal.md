@@ -1,5 +1,14 @@
 # Physics 311 Journal
 
+## September 6, 2026
+
+### Week 3
+
+A simulation should not just be trusted because the results may look reasonable. Comparing Euler and Euler-Cromer shows that small changes in the numerical method can produce different energy behavior, even when using the same physics and step size. I learned that decreasing the step size can help reveal whether the results are converging toward the expected behavior, a viable method of confirming results. Overall, simulations are useful for understanding physical systems, but their results should be checked against analytical solutions, conservation laws, and convergence tests to double check.
+
+
+# Physics 311 Journal
+
 ## August 30, 2026
 
 ### Week 2
