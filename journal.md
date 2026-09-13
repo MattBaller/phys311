@@ -1,5 +1,13 @@
 # Physics 311 Journal
 
+## September 13, 2026
+
+### Week 4
+
+The hardest concept so far was phase-space plots. Despite having seen all these concepts in ME 363 (system dynamics) I have never seen them before and they were confusing to read at first. This week, I have defninetly become more comfortable leaning the basics and loops for Python. I am now at a point where I can quickly look at a code or program and understand it. Before, it could be overwhelming breaking down each line and knowing what some Python syntax meant. I used to believe that MATLAB was easier, now I see the intuitiveness of Python which is something that clicked for me.
+
+
+
 ## September 6, 2026
 
 ### Week 3
