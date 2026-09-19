@@ -1,5 +1,15 @@
 # Physics 311 Journal
 
+## September 19, 2026
+
+### Week 5
+
+While momentum and collisions is not a difficult concept for me, it still has been a while since  have seen it. This lab felt like it needed more understanding of the concept, so I read the lesson more thoroughly and did some external research on the topic. It was not as straight-forward and I needed to rely on my growing coding knowledge and previous labs. It is nice to know I can use AI to help understand something or do something in a cleaner more effective way. I have found myself trying to code in a more convoluded way, and I always try to be more open to new methods even if I do not understand them at first.
+
+
+
+# Physics 311 Journal
+
 ## September 13, 2026
 
 ### Week 4
