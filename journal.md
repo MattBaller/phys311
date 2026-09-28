@@ -1,5 +1,15 @@
 # Physics 311 Journal
 
+## September 27, 2026
+
+### Week 6
+
+The concepts for this lab were a bit unfamiliar to me since Kepler's Law deals with astronomical bodies, it does not have much, if any at all, presence in engineering coursework. Like it was stated in this assignment, this is a very physically rich lab, which I had to do more research apart from the lessons. This lab took some time for me, but as long as I understand the physical concepts, the loops, functions, and calculations become easier to code.
+
+
+
+# Physics 311 Journal
+
 ## September 19, 2026
 
 ### Week 5
