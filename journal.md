@@ -1,5 +1,15 @@
 # Physics 311 Journal
 
+## October 4, 2026
+
+### Week 7
+
+This lab was nice as it had an overall theme, but lab was divded into three different simulations of a pendulum, rolling objects, and a spinning body. The hardest concept so far was collisions. Since there are three different cases of perfectly elastic, inelastic, and perfectly inelastic, there are different behaviors with each case. There is also the necessity of setting up an enviorment, such as walls for bodies to collide into rather than drifting off. I imagine later that there will be labs needing some coniditons to be defined for an enviorment.
+
+
+
+# Physics 311 Journal
+
 ## September 27, 2026
 
 ### Week 6
