@@ -1,5 +1,15 @@
 # Physics 311 Journal
 
+## October 18, 2026
+
+### Week 8
+
+The lab for this week was a bit reminiscent for when I started learning to use classes with java script. I had to run back through some old notes and do a bit of research to understand the whole workflow of what talks to what in the script. I felt like this lab was a bit confusing for me and what it wanted with the demo. I made sure it ran with the other components it was calling for from the lab07_engine folder, but I was not sure if it was something I needed to edit at all. With the working engine nonetheless, I am looking forward to how we will use it in upcoming labs.
+
+
+
+# Physics 311 Journal
+
 ## October 4, 2026
 
 ### Week 7
