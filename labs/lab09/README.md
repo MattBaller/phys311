@@ -6,17 +6,9 @@ Week 9 lesson. Study it, run it, break it — then build your own for Lab 9.
 
 ---
 
-## Two ways to run it
+## Running the simulation
 
-### 1. `standalone.html` — just double-click it
-Everything inlined into one file. No server, no setup. Use this if you only
-want to *see* it work.
-
-### 2. `index.html` — the real project (recommended)
-This is the modular version, and it is the structure Lab 9 asks you to build.
-ES6 modules are blocked over `file://` by browser security, so you need a
-local server:
-
+### 1. `index.html`
 - **VS Code:** install the **Live Server** extension, right-click
   `index.html` → *Open with Live Server*.
 - **Any terminal with Python:** `python -m http.server 8000`, then open
@@ -30,7 +22,7 @@ local server:
 ```
 node tests/validate.js
 ```
-Runs the same 9 checks and exits non-zero on failure. **This is the payoff
+Runs the same 6 checks and exits non-zero on failure. **This is the payoff
 for the layering rule** (below): because `engine/` never mentions the DOM,
 your physics runs anywhere.
 
@@ -58,36 +50,14 @@ render/             drawing only - reads the world, never changes it
   Renderer.js       discs, trails, vectors, grid, bounds
   HUD.js            live conservation readout
 
-scenes/scenes.js    7 scenes; each returns a fresh World
-tests/validate.js   9 headless checks (Node + in-page)
+scenes/scenes.js    3 scenes; each returns a fresh World
+tests/validate.js   6 headless checks (Node + in-page)
 ```
 
----
-
-## The layering rule
-
-> **Nothing in `engine/` may mention `ctx`, `canvas`, `document`, `window`,
-> `requestAnimationFrame`, or a colour.**
-
-Check it yourself:
-
-```
-grep -rn "ctx\|canvas\|document\|window\|requestAnimationFrame" engine/
-```
-
-The only hits are `typeof performance !== 'undefined'` guards in `World.js`,
-which exist precisely so the engine also runs in Node. Lab 9 grades this.
-
-Why it matters: it is what makes `tests/validate.js` possible, it is what will
-let you swap the renderer in Physics 312 (Three.js replaces `render/`, your
-`engine/` survives untouched), and it is what keeps a convergence study from
-becoming a refactor.
-
----
 
 ## Verified reference values
 
-Produced by `node tests/validate.js`. Your Lab 9 engine should reproduce these.
+Produced by `node tests/validate.js`
 
 | Check | Expected |
 |---|---|
@@ -129,26 +99,27 @@ Produced by `node tests/validate.js`. Your Lab 9 engine should reproduce these.
 
 ## Things to try
 
-- **Scene 1 (projectile) + switch integrators.** Nothing changes. Constant
-  force makes Verlet *exact* and Euler/Euler-Cromer differ only by
-  ±½gtΔt — see the Week 2 §5.5 insert. A projectile **cannot** grade an
-  integrator.
-- **Scene 6 (spring chain) + switch to Euler.** Now watch the HUD go red.
-  Position-dependent force switches the feedback loop back on.
-- **Scene 4 (isolated) vs Scene 2 (walls).** Momentum is machine-zero in one
-  and badly violated in the other. Both are correct physics — a wall is an
-  external force.
-- **Scene 7 (crowd) + toggle broad phase.** Pair checks drop from 31125 to a
-  few dozen. The trajectories must stay bit-identical.
-- **Scene 3 (e = 0.8).** Energy decays. Lower `e` does *not* always mean less
-  energy kept: at e = 0 bodies clump, stop colliding, and dissipation shuts
-  itself off.
+## Scenes
 
----
+**Scene 1 – Collisions in a Box**
+- Simulates 20 moving balls inside a bounded box.
+- Includes a stationary central mass that the balls can collide with.
+- Demonstrates elastic and inelastic collisions, momentum transfer, and energy changes.
 
-## Lab 9 reminder
+**Scene 2 – Galaxy / Whirlpool**
+- Simulates a four-body gravitational system.
+- Bodies follow coordinated orbital paths to create a galaxy or whirlpool-like motion.
+- Demonstrates gravitational interactions and multi-body dynamics.
 
-Your submission needs its own `engine/` + `render/` split, a working
-conservation HUD, a broad phase with a measured check-count comparison, and
-deployment to GitHub Pages. Reusing the *structure* of this project is
-expected; copying the files is not. Cite this reference in your README.
+**Scene 3 – Spring-Mass Chain**
+- Simulates a chain of masses connected by springs.
+- Demonstrates coupled oscillations and the transfer of energy between connected masses.
+
+## Controls
+
+- **Scene Selector:** Switch between the three available simulations.
+- **Play / Pause:** Start or pause the simulation.
+- **Reset:** Restart the selected scene and restore its initial conditions.
+- **Simulation Parameters:** Adjust any available scene-specific settings using the controls provided in the interface.
+
+Select a scene from the scene selector to load it, then use the playback controls to run or pause the simulation.
