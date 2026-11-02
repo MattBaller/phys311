@@ -1,5 +1,14 @@
 # Physics 311 Journal
 
+## November 1, 2026
+
+### Week 9
+
+This lab for this week was the longest. Eventually, I did get the idea of what files did what for the web structure. index.js defines the webpage structure and provides the interface for displaying the simulation, including the scene selector and control elements. main.js initializes the simulation, creates the selected scene, connects the physics engine to the renderer and HUD, and manages the animation loop and user controls. The renderer draws the simulation on the HTML canvas, displaying bodies, their motion, and other visual elements and the and HUD displays simulation information, including elapsed time, body count, energy, momentum, collision statistics, and performance measurements. I thought being able to traverse and learn the structure was super helpful and I can apply that intuition when looking at other simulation scripts in the future.
+
+
+# Physics 311 Journal
+
 ## October 18, 2026
 
 ### Week 8
