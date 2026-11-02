@@ -1,12 +1,10 @@
-***Write-up (PDF or Markdown) via Canvas:***
-
 **A module dependency diagram (ASCII, Mermaid, or a photo of a sketch):**
-![alt text](screenshots/diagram.png)
+![alt text](screenshots/diagram.PNG)
 
 
 
 **Jitter-bug demonstration + explanation (B1)**
-![alt text](screenshots/no_jitter.png)
+![alt text](screenshots/no_jitter.PNG)
 
 The vn > 0 guard prevents the collision solver from applying an impulse when two overlapping bodies are already moving apart. Without it, the solver applies an unnecessary impulse that can reverse their motion and cause repeated bouncing or jittering. The guard ensures that impulses are applied only when bodies are approaching each other, while positional correction separately resolves any overlap.
 
@@ -42,7 +40,9 @@ At e = 1, collisions are perfectly elastic, so both momentum and kinetic energy 
 **The performance scaling table + bottleneck analysis (C)**
 ![alt text](screenshots/performance_table.PNG)
 
-Physics time grows faster than rendering time, meaning that the bottleneck most likely is coming from the collision detection in the code.
+Physics time grows faster than rendering time, meaning that the bottleneck most likely is coming from the collision detection in the code. Which is consistent with the prediction from the lesson.
+
+My machine can only sustain 60 fps at 20 bodies.
 
 **Honest note on any engine changes a scene forced**
-The only change I made to the engine is in the NewtonianGravity softing variable. I changed it from 0 to 0.02, as only one scene was using that force, and the variable did not need to be implemented to be variable or a user selection.
+The only change I made to the engine is in the NewtonianGravity softening variable. I changed it from 0 to 0.02, as only one scene was using that force, and the variable did not need to be implemented to be variable or a user selection.
