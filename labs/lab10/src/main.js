@@ -7,13 +7,19 @@ import { Controls }     from './ui/Controls.js';
 import { PointerInput } from './ui/Pointer.js';
 import { KeyboardInput } from './ui/Keyboard.js';
 import { StateURL }     from './ui/StateURL.js';
-import { SCENES, SCENE_LIST } from './scenes.js';
+import { SCENES } from './scenes.js';
 import { Body, Vec2 }   from './engine/World.js';
 
 const DEFAULTS = {
-  scene: 'billiards', integrator: 'verlet', dt: 1 / 240,
-  restitution: 0.95, gravity: 9.81, drag: 0.0,
-  speed: 1.0, count: 24, trails: true, spawnMode: false
+  scene: 'spaceLauncher',
+  integrator: 'verlet',
+  dt: 1 / 167,
+  restitution: 0.4,
+  gravity: 9.81,
+  drag: 0.0,
+  speed: 1.0,
+  trails: true,
+  spawnMode: false
 };
 
 const canvas = document.getElementById('sim');
@@ -28,6 +34,15 @@ render.reducedMotion =
 
 // ---- state: URL hash wins over defaults, so a shared link reproduces a run ----
 const state = { ...DEFAULTS, ...StateURL.decode(location.hash, DEFAULTS) };
+
+// Keep physics parameters fixed regardless of URL settings.
+Object.assign(state, {
+  dt: 1 / 167,
+  gravity: 9.81,
+  restitution: 0.4,
+  drag: 0.0,
+  speed: 1.0
+});
 
 let world = null, view = null, paused = false, gameWon = false, lastSubsteps = 0;
 let pointer = null, keyboard = null;
@@ -56,6 +71,7 @@ function build() {
 function applyLive() {
   if (!world) return;
   world.setIntegrator(state.integrator);
+  world.DT = state.dt;
   world.restitution = state.restitution;
   for (const f of world.forces) {
     if (f.constructor.name === 'UniformGravity')  f.g = state.gravity;
@@ -127,7 +143,7 @@ function frame(now) {
   if (!Number.isFinite(dtFrame) || dtFrame < 0) dtFrame = 0;
 
   if (!paused && !gameWon) {
-    const r = world.advance(dtFrame * state.speed, 8);
+    const r = world.advance(dtFrame * state.speed, 32);
     lastSubsteps = r.substeps;
     render.recordTrails(world);
 

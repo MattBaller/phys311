@@ -14,7 +14,7 @@ export class PointerInput {
 
     // Slingshot settings
     this.launchScale = 3.0;
-    this.maxLaunchSpeed = 30;
+    this.maxLaunchSpeed = 20;
     this.launchOrigin = null;
 
     this._bind();
@@ -40,18 +40,19 @@ export class PointerInput {
 
       const b = this.world.pick(x, y, 0.15);
 
-      if (b) {
-        this.spring.grab(b, x, y);
+// Only allow grabbing projectiles that have not been launched.
+if (b && b.tag === 'projectile' && b.locked) {
+  this.spring.grab(b, x, y);
 
-        if (this.spring.slingshotMode) {
-          this.launchOrigin = {
-            x: b.pos.x,
-            y: b.pos.y
-          };
-        }
+  if (this.spring.slingshotMode) {
+    this.launchOrigin = {
+      x: b.pos.x,
+      y: b.pos.y
+    };
+  }
 
-        c.classList.add('grabbing');
-      }
+  c.classList.add('grabbing');
+}
     });
 
     c.addEventListener('pointermove', (ev) => {

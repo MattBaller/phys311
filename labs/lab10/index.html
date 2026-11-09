@@ -28,75 +28,46 @@
     
   </main>
 
-  <aside class="panel" aria-label="Simulation controls">
+  
+<aside class="panel" aria-label="Simulation controls">
 
-    <h2>Scene</h2>
-    <div class="row">
-      <label for="scene">Preset</label>
-      <select id="scene">
-        <option value="billiards">1 &mdash; Billiards in a box</option>
-        <option value="chain">2 &mdash; Spring chain</option>
-        <option value="orbits">3 &mdash; N-body orbits</option>
-        <option value="projectile">4 &mdash; Projectile (control case)</option>
-        <option value="pendulums">5 &mdash; Pendulum row</option>
-        <option value="spaceLauncher">5 &mdash; Space Launcher</option>
-      </select>
-    </div>
-    <div class="row">
-      <label for="count">Bodies <output id="count-out"></output></label>
-      <input type="range" id="count" min="3" max="120" step="1" value="24">
-    </div>
+  <div class="row">
+    <label for="dt">Timestep <output id="dt-out"></output></label>
+    <input type="range" id="dt"
+           min="0.001" max="0.020" step="0.001" value="0.006">
+  </div>
 
-    <h2>Solver</h2>
-    <div class="row">
-      <label for="integrator">Integrator</label>
-      <select id="integrator">
-        <option value="euler">Euler (explicit)</option>
-        <option value="ec">Euler&ndash;Cromer</option>
-        <option value="verlet">Velocity Verlet</option>
-      </select>
-    </div>
-    <div class="row">
-      <label for="dt">Timestep <output id="dt-out"></output></label>
-      <input type="range" id="dt" min="0.001" max="0.02" step="0.001" value="0.004">
-    </div>
+  <h2>Physics</h2>
 
-    <h2>Physics</h2>
-    <div class="row">
-      <label for="grav">Gravity <output id="grav-out"></output></label>
-      <input type="range" id="grav" min="0" max="25" step="0.01" value="9.81">
-    </div>
-    <div class="row">
-      <label for="rest">Restitution <output id="rest-out"></output></label>
-      <input type="range" id="rest" min="0" max="1" step="0.01" value="0.95">
-    </div>
-    <div class="row">
-      <label for="drag">Drag coefficient <output id="drag-out"></output></label>
-      <input type="range" id="drag" min="0" max="0.2" step="0.001" value="0">
-    </div>
-    <div class="row">
-      <label for="speed">Time scale <output id="speed-out"></output></label>
-      <input type="range" id="speed" min="0.1" max="2" step="0.05" value="1">
-    </div>
+  <div class="row">
+    <label>Gravity</label>
+    <output>9.81 m/s²</output>
+  </div>
 
-    <h2>Display</h2>
-    <label class="check"><input type="checkbox" id="trails" checked> Show trails</label>
-    <label class="check"><input type="checkbox" id="spawn"> Click adds a body</label>
+  <div class="row">
+    <label>Restitution</label>
+    <output>0.40</output>
+  </div>
 
-    <div class="btns">
-      <button id="btn-play"  aria-pressed="true">&#9208; Pause</button>
-      <button id="btn-step">&#9197; Step</button>
-      <button id="btn-reset">&#8635; Reset</button>
-      <button id="btn-link">&#128279; Copy link</button>
-    </div>
+  <div class="row">
+    <label>Drag coefficient</label>
+    <output>0.000</output>
+  </div>
 
-    <h2>Keyboard</h2>
-    <p class="keys">
-      <kbd>Space</kbd> play/pause &middot; <kbd>S</kbd> step &middot; <kbd>R</kbd> reset<br>
-      <kbd>Tab</kbd> select body &middot; <kbd>&larr;&uarr;&darr;&rarr;</kbd> drag it<br>
-      <kbd>+</kbd><kbd>&minus;</kbd> zoom &middot; <kbd>T</kbd> trails &middot; <kbd>1</kbd>&ndash;<kbd>5</kbd> scene
-    </p>
-  </aside>
+  <div class="row">
+    <label>Time scale</label>
+    <output>1.00×</output>
+  </div>
+
+  <div class="btns">
+    <button id="btn-play" aria-pressed="true">&#9208; Pause</button>
+    <button id="btn-step">&#9197; Step</button>
+    <button id="btn-reset">&#8635; Reset</button>
+    <button id="btn-link">&#128279; Copy link</button>
+  </div>
+
+</aside>
+
 </div>
 
 

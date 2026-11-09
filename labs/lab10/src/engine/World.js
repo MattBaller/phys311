@@ -74,16 +74,19 @@ this.bodies = this.bodies.filter(b => !b.destroyed);
   }
 
   // Fixed-timestep accumulator. Returns alpha in [0,1) for render interpolation.
-  advance(frameSeconds, maxSteps = 8) {
-    this._acc += Math.min(frameSeconds, maxSteps * this.DT);  // clamp: no spiral of death
-    let n = 0;
-    while (this._acc >= this.DT && n < maxSteps) {
-      this.step(this.DT);
-      this._acc -= this.DT;
-      n++;
-    }
-    return { substeps: n, alpha: this._acc / this.DT };
+  advance(frameSeconds, maxSteps = 32) {
+  this._acc += Math.max(0, frameSeconds);
+
+  let n = 0;
+
+  while (this._acc >= this.DT && n < maxSteps) {
+    this.step(this.DT);
+    this._acc -= this.DT;
+    n++;
   }
+
+  return { substeps: n, alpha: this._acc / this.DT };
+}
 
   // One deterministic substep, for the Step button while paused.
   stepOnce() { this.step(this.DT); return 1; }
