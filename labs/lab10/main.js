@@ -3,11 +3,11 @@
 import { Camera }       from './render/Camera.js';
 import { Renderer }     from './render/Renderer.js';
 import { HUD }          from './render/HUD.js';
-import { Controls }     from './ui/Controls.js';
-import { PointerInput } from './ui/Pointer.js';
-import { KeyboardInput } from './ui/Keyboard.js';
-import { StateURL }     from './ui/StateURL.js';
-import { SCENES } from './scenes.js';
+import { Controls }     from './ui.js';
+import { PointerInput } from './input.js';
+import { KeyboardInput } from './input.js';
+import { StateURL }     from './ui.js';
+import { SCENES } from './engine/World.js';
 import { Body, Vec2 }   from './engine/World.js';
 
 const DEFAULTS = {

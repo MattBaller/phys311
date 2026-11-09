@@ -1,157 +1,93 @@
-# Physics 311 — Block 3, Week 10 Reference Project
-### Interactivity, UI & Publishing
+# Physics 311 — Slingshot Physics Simulation
 
-A complete, runnable browser simulation showing everything Week 10 asks for:
-pointer dragging, a live control panel, pause/step/reset, keyboard accessibility,
-shareable permalinks, an honest conservation HUD, and a GitHub-Pages-ready layout.
+## 1. What it is
 
-This is the Week 9 engine with a **UI layer added on top**. The `engine/` folder
-is unchanged in character: it still contains no `canvas`, no `document`, no pixels.
+This project is a browser-based, two-dimensional physics game built for Physics 311. The player uses a slingshot-style launcher to fire projectiles at target bodies ("pigs"). The simulation combines a physics engine with canvas rendering and a user interface.
 
----
+The project separates physics calculations from drawing and user input. It can be run in a browser, while the physics validation script can be run from the command line.
 
-## 1. Three ways to run it
+### Running the project
 
-| How | What to do | Use it when |
-|---|---|---|
-| **Standalone** | double-click `standalone.html` | you just want to see it work, right now |
-| **Modules** | open the folder in VS Code → right-click `index.html` → **Open with Live Server** | this is the structure Lab 10 asks for |
-| **Headless** | `node tests/validate.js` | checking the physics without a browser |
+1. Open the project folder in VS Code.
+2. Open `index.html` with the **Live Server** extension.
+3. Use the browser page that Live Server opens.
 
-> **`index.html` will NOT work from a `file://` URL.** Browsers block ES6 modules
-> over `file://`, and you will see:
-> `Access to script ... has been blocked by CORS policy`
-> or `Failed to load module script`.
-> That is not a bug in your code. Use Live Server, or run
-> `python3 -m http.server 8000` in this folder and visit `http://localhost:8000`.
-> `standalone.html` exists so you have something to open when a server is not handy.
+Do not open the module-based `index.html` directly with a `file://` URL. Browser security restrictions can prevent its JavaScript modules from loading.
+
+If the project includes a standalone build, `standalone.html` can be opened directly in a browser.
 
 ---
 
-## 2. Try these five things first
+## 2. What physics
 
-1. **Drag a ball.** Click and hold any body, then whip it around. Watch
-   `Δp/p₀` — on scene 3 it is `n/a` until you grab something, because *your finger
-   is an external force*.
-2. **Scene 4, then scene 2.** On the projectile, switch Euler → Verlet and
-   nothing changes. On the spring chain, Euler turns the HUD red within a second.
-   Constant force cannot judge an integrator (Week 2, §5.5).
-3. **Drag the restitution slider to 0.5.** Energy visibly drains, but `ΔE/E₀`
-   stays at `0.000 %`. The ledger books inelastic loss separately, so the drift
-   readout measures *your solver*, not *your physics*.
-4. **Press Space, then S repeatedly.** Single-stepping is bit-identical to
-   running — `tests/validate.js` check 3 proves it.
-5. **Click "Copy link."** Paste it in a new tab. The whole configuration
-   comes back. This is how you send your instructor a bug report.
+The simulation models motion and collisions in two dimensions.
+
+- **Newton's second law:** Forces determine each body's acceleration, which is used to update its velocity and position over time.
+- **Gravity:** A constant downward acceleration acts on bodies in the scene.
+- **Time integration:** The integrator advances the system in discrete time steps. The timestep control changes the size of each physics step.
+- **Collisions:** Bodies are represented by circular collision shapes. When bodies collide, the collision response changes their velocities according to the collision geometry and coefficient of restitution.
+- **Restitution:** The fixed restitution value is 0.40. A collision with a restitution below 1 is inelastic, so some kinetic energy is dissipated.
+- **Slingshot interaction:** The projectile is pulled away from its launch position and released. The pull determines the projectile's launch velocity.
+- **Target removal:** A target is removed when it experiences a sufficiently hard collision.
+
+The interface displays fixed physics parameters: gravity is 9.81 m/s², restitution is 0.40, drag coefficient is 0, and time scale is 1.00×.
 
 ---
 
-## 3. Layout
+## 3. How to use
 
-```
-index.html           module version (needs a server)
-standalone.html      generated single-file build (double-clickable)
-styles.css
-.nojekyll            tells GitHub Pages not to run Jekyll
-src/
-  engine/            PURE PHYSICS - no DOM, runs in Node
-    Vec2.js  Body.js  Integrators.js  Forces.js  Collisions.js  World.js
-  render/            PIXELS - the only place that knows about canvas
-    Camera.js  Renderer.js  HUD.js
-  ui/                THE USER - input, controls, permalinks
-    Pointer.js  Keyboard.js  Controls.js  StateURL.js
-  scenes.js          scene builders: (state) -> World
-  main.js            the only file that wires all three layers together
-tests/
-  validate.js        22 headless physics + publishing checks
-  smoke-dom.js       boots main.js against a stub DOM
-```
+### Simulation controls
 
-**The layering rule, restated for Week 10:** input belongs in `ui/`, but the
-*force it produces* belongs in `engine/`. `PointerSpring` lives in `Forces.js`
-and knows only about world coordinates. `ui/Pointer.js` does the pixel→metre
-conversion and writes a target into it. That is why dragging works identically
-with a mouse, a finger, a stylus, or the arrow keys — three input paths, one
-force object.
-
----
-
-## 4. Verified numbers (`node tests/validate.js` → 22/22)
-
-| Check | Result |
+| Control | Action |
 |---|---|
-| Camera pixel↔world round trip | worst error **8.9e-16** |
-| Reset determinism, 3000 steps | **bit-for-bit identical** |
-| 1500 single steps vs one 1500-step run | **bit-for-bit identical** |
-| 60 Hz / 144 Hz / jittery frames | all reach **t = 10.0000 s**, 2400 substeps |
-| 2 s tab stall, clamped | **8 substeps** instead of 480 |
-| Released PointerSpring | contributes **exactly nothing** |
-| Isolated N-body, untouched | \|Δp\|/\|p₀\| = **5.2e-14** |
-| …while grabbed | \|p\| = **7.2e+1** — correctly *not* conserved |
-| …after release | **4.0e-15** |
-| Projectile: Euler vs Verlet | 8.2e-3 vs 3.0e-14 — **degenerate** |
-| Spring chain: Euler vs Verlet | 1.6e+0 vs 1.6e-4 — **10⁴× worse** |
-| Energy ledger at e = 1 / 0.95 / 0.5 / 0 | drift **≤ 8e-16** in every case |
-| Permalink round trip | every control survives |
-| DOM identifiers in `engine/` | **none** |
-| Absolute paths in `index.html` | **none** |
+| **Timestep slider** | Changes the physics timestep used to advance the simulation. Smaller values use more, shorter physics steps; larger values use fewer, longer steps. |
+| **Pause** | Pauses the simulation. Press it again to resume. |
+| **Step** | Advances the simulation by one physics step while paused. |
+| **Reset** | Restores the initial scene and resets the simulation. |
+| **Copy Link** | Copies a URL representing the current simulation state, where supported by the current build. |
+
+### Launching a projectile
+
+1. Click and hold the available projectile.
+2. Drag it away from its launch position to set the launch direction and pull distance.
+3. Release the pointer to launch it.
+4. Observe the projectile's motion and its collisions with the targets.
+
+The projectile can be aimed before it is launched. Once released, it is no longer in the aiming state and should not be draggable as though it were still attached to the slingshot.
 
 ---
 
-## 5. Accessibility checklist (Lab 10 grades this)
+## 4. How you know it's right
 
-- Every mouse action has a keyboard equivalent (`Keyboard.js`).
-- The canvas is `tabindex="0"` and has a descriptive `aria-label`.
-- Visible `:focus-visible` outline in UT orange on every control.
-- Sliders carry `aria-valuetext` so a screen reader says "9.81 m/s²", not "9.81".
-- A polite `aria-live` region announces pause, reset, scene changes and selection.
-- `prefers-reduced-motion` disables trails.
-- `touch-action: none` on the canvas so a drag does not scroll the page.
-- Layout reflows to a single column below 860 px.
+The project includes a headless validation script for checking the physics without opening the browser.
 
----
-
-## 6. Publishing to GitHub Pages
-
-1. Put this folder in your repo (e.g. `labs/week10/`), commit, push.
-2. Repo → **Settings → Pages** → Source: **Deploy from a branch** → `main` / `/ (root)`.
-3. Wait ~60 s. Visit `https://USERNAME.github.io/REPO/labs/week10/`.
-
-**The four failures that actually happen:**
-
-| Symptom | Cause |
-|---|---|
-| Blank page, 404 on `main.js` | **Case.** `Vec2.js` ≠ `vec2.js`. Your laptop does not care; the server does. |
-| Works locally, 404 everywhere online | An **absolute** path `/src/main.js`. Project pages live under `/REPO/`. Use `src/main.js`. |
-| Folders beginning with `_` vanish | Jekyll. Keep the empty `.nojekyll` file. |
-| Your fix is not showing up | Browser cache. Hard-reload with Ctrl/Cmd-Shift-R. |
-
-Run `node tests/validate.js` before you deploy — check 10 catches the first two
-automatically.
-
----
-
-## 7. Rebuilding `standalone.html`
-
-It is generated from `src/`, so edit `src/` and regenerate, never the other way:
+From the project root, run:
 
 ```bash
-python3 build_standalone.py
+node tests/validate.js
 ```
 
----
+The validation checks are intended to catch errors in the underlying physics, including:
 
-## 8. Honest limitations
+- **Determinism:** Repeating the same initial conditions and number of steps should produce the same result.
+- **Time-step behavior:** The physics should advance according to simulated time, rather than changing its physical speed simply because the browser renders frames at a different rate.
+- **Collision response:** Collisions should update body velocities consistently with the collision model and the specified restitution.
+- **Momentum behavior:** Momentum should be conserved in an isolated system when no external forces act. Gravity, wall interactions, and user-controlled forces can change the momentum of the bodies being considered.
+- **Interaction behavior:** Pointer input should affect the intended body and should not continue to control a projectile after it has been launched.
 
-- Collisions are **circle-only** and resolved in a single pass. A dense pile
-  will jitter; that needs iterative solving, which is beyond Week 10.
-- There is **no rotation**. Bodies carry `theta`/`omega` nowhere — spin was
-  Week 6 in Python and is left as a Lab 10 extension.
-- The spatial hash turns on above 40 bodies. Check 7 of the Week 9 project
-  showed brute force and hash agree to **exactly 0.0**, so it is a speed
-  optimisation only.
-- `prefers-reduced-motion` stops trails but does not stop the simulation.
+A passing validation script is evidence that the tested cases behave as expected. It does not prove that every possible scene, timestep, or collision arrangement is error-free. Browser testing is still necessary to check the complete game, its controls, and its rendering.
 
 ---
 
-*Physics 311 — Computational Mechanics. Reference implementation for Block 3, Week 10.*
+## 5. Known limitations
+
+- **Circular collision shapes:** Bodies use circle-based collision detection and response. The simulation does not model detailed contact between arbitrary shapes.
+- **Simplified collision solving:** Collisions are handled with a simplified impulse response. Dense groups of overlapping bodies or several simultaneous impacts may produce jitter or imperfect results.
+- **No rotational dynamics:** The current model focuses on translational motion. It does not fully model angular momentum, torque, or spin.
+- **Numerical approximation:** Motion is advanced in finite time steps. Large timesteps can make trajectories and collisions less accurate or less stable.
+- **Simplified environment:** The game uses a fixed scene and simplified physics parameters rather than a fully configurable physical environment.
+- **Not a full rigid-body engine:** The project is an educational simulation. It does not include all of the contact, friction, constraint, and shape-handling features found in a general-purpose physics engine.
+
+---
+
+*Physics 311 — Computational Mechanics.*
