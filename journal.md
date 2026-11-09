@@ -1,5 +1,15 @@
 # Physics 311 Journal
 
+## November 8, 2026
+
+### Week 11
+
+This assignment was the most fun. I was surprised how fun it can be to be the coder AND the user, playing the game and finding bugs is a short break from simply looking at you script. My final project may be some type of game since game creation is what is what interested most in terms of coding. I started by attempting to code simple mods for Minecraft and used the software Game Maker Studio. I wanted to try and make a simulation for fuel cells before, however I think doing some type of game would be more enjoyable. It was a bit interesting though, since the physics still had to be possible, I had to tweak and keep things in mind such as mass not being able to be destroyed like an Angry Bird pig popping.
+
+
+
+# Physics 311 Journal
+
 ## November 1, 2026
 
 ### Week 10
