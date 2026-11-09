@@ -19,6 +19,13 @@ export class Controls {
   _wire() {
     const s = this.state;
 
+
+    // Integrator selector
+    this.$('integrator')?.addEventListener('change', e => {
+     s.integrator = e.target.value;
+      this.onRebuild();
+    });
+
     // Timestep slider
     this.$('dt')?.addEventListener('input', e => {
       s.dt = parseFloat(e.target.value);
@@ -28,6 +35,38 @@ export class Controls {
 
      this.onChange();
     });
+
+// Simulation speed slider
+this.$('speed')?.addEventListener('input', e => {
+  s.speed = parseFloat(e.target.value);
+  this.$('speed-out').textContent = `${s.speed.toFixed(2)}×`;
+  this.onChange();
+});
+
+// Physics parameter sliders
+for (const id of ['G', 'restitution', 'drag']) {
+  this.$(id)?.addEventListener('input', e => {
+    s[id] = parseFloat(e.target.value);
+
+    const precision = id === 'G' ? 2 : id === 'restitution' ? 2 : 3;
+    this.$(`${id}-out`).textContent = s[id].toFixed(precision);
+
+    this.onChange();
+  });
+}
+
+// Visualization toggles
+for (const [id, key] of [
+  ['show-force', 'showForce'],
+  ['show-velocity', 'showVelocity'],
+  ['show-trails', 'showTrails']
+]) {
+  this.$(id)?.addEventListener('change', e => {
+    s[key] = e.target.checked;
+    this.onChange();
+  });
+}
+
     // Simulation buttons
     for (const [id, act] of [
       ['btn-play', 'togglePause'],
@@ -48,6 +87,27 @@ export class Controls {
     if (integrator) {
       integrator.value = this.state.integrator;
     }
+
+    for (const [id, key] of [
+  ['show-force', 'showForce'],
+  ['show-velocity', 'showVelocity'],
+  ['show-trails', 'showTrails']
+]) {
+  const checkbox = this.$(id);
+  if (checkbox) checkbox.checked = this.state[key];
+}
+
+    for (const id of ['G', 'restitution', 'drag']) {
+  const slider = this.$(id);
+  const output = this.$(`${id}-out`);
+
+  if (slider) slider.value = this.state[id];
+
+  if (output) {
+    const precision = id === 'G' ? 2 : id === 'restitution' ? 2 : 3;
+    output.textContent = this.state[id].toFixed(precision);
+  }
+}
   }
 
   setPlayLabel(paused) {
@@ -58,6 +118,7 @@ export class Controls {
     button.textContent = paused ? '▶ Play' : '⏸ Pause';
     button.setAttribute('aria-pressed', String(!paused));
   }
+  
 }
 
 
@@ -75,7 +136,7 @@ export const StateURL = {
     p.set('int',   s.integrator);
     p.set('dt',    String(s.dt));
     p.set('e',     String(s.restitution));
-    p.set('g',     String(s.gravity));
+    p.set('G',     String(s.G));
     p.set('drag',  String(s.drag));
     p.set('speed', String(s.speed));
     p.set('n',     String(s.count));
@@ -93,7 +154,7 @@ export const StateURL = {
       integrator:  p.get('int')   || defaults.integrator,
       dt:          num('dt',    defaults.dt),
       restitution: num('e',     defaults.restitution),
-      gravity:     num('g',     defaults.gravity),
+      G:           num('G', defaults.G),
       drag:        num('drag',  defaults.drag),
       speed:       num('speed', defaults.speed),
       count:       Math.round(num('n', defaults.count))

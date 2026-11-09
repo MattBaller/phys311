@@ -1,3 +1,18 @@
+// Pointer and keyboard event handling for the simulation.
+export function eventToWorld(event, canvas, camera) {
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0 || canvas.width <= 0 || canvas.height <= 0) {
+    throw new RangeError('Canvas must have a non-zero display and drawing-buffer size.');
+  }
+
+  const pixelX = (event.clientX - rect.left) * (canvas.width / rect.width);
+  const pixelY = (event.clientY - rect.top) * (canvas.height / rect.height);
+  return camera.toWorld(
+    pixelX * (camera.w / canvas.width),
+    pixelY * (camera.h / canvas.height)
+  );
+}
+
 // Keyboard.js — ACCESSIBILITY. Every mouse action has a keyboard equivalent,
 // so the simulation is usable without a pointing device.
 //   Space  play/pause      S  single step      R  reset
@@ -80,6 +95,12 @@ export class PointerInput {
     this.launchOrigin = null;
 
     this._bind();
+  }
+
+ _updateCursor(ev) {
+    this.cursor = eventToWorld(ev, this.canvas, this.cam);
+    this.onCursor(this.cursor);
+    return this.cursor;
   }
 
   _world(ev) {

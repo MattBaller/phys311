@@ -38,26 +38,63 @@
   </div>
 
   <h2>Physics</h2>
+<div class="row">
+  <label for="integrator">Integrator</label>
+  <select id="integrator">
+    <option value="euler">Euler</option>
+    <option value="eulerCromer">Euler-Cromer</option>
+    <option value="verlet">Velocity Verlet</option>
+  </select>
+</div>
+  <div class="row">
+  <label for="G">Gravitational constant G
+    <output id="G-out"></output>
+  </label>
+  <input type="range" id="G" min="0" max="10" step="0.1" value="1">
+</div>
+
+<div class="row">
+  <label for="restitution">Restitution
+    <output id="restitution-out"></output>
+  </label>
+  <input type="range" id="restitution" min="0" max="1" step="0.01" value="0.40">
+</div>
+
+<div class="row">
+  <label for="drag">Drag coefficient
+    <output id="drag-out"></output>
+  </label>
+  <input type="range" id="drag" min="0" max="1" step="0.001" value="0">
+</div>
 
   <div class="row">
-    <label>Gravity</label>
-    <output>9.81 m/s²</output>
+    <label>Time scale <output id="speed-out"></output></label>
+   <input
+    type="range"
+    id="speed"
+    min="0.25"
+    max="2.0"
+    step="0.05"
+    value="1.0"
+  >
   </div>
 
-  <div class="row">
-    <label>Restitution</label>
-    <output>0.40</output>
-  </div>
+<h2>Visualization</h2>
 
-  <div class="row">
-    <label>Drag coefficient</label>
-    <output>0.000</output>
-  </div>
+<div class="row">
+  <label for="show-force">Force vectors</label>
+  <input type="checkbox" id="show-force">
+</div>
 
-  <div class="row">
-    <label>Time scale</label>
-    <output>1.00×</output>
-  </div>
+<div class="row">
+  <label for="show-velocity">Velocity vectors</label>
+  <input type="checkbox" id="show-velocity">
+</div>
+
+<div class="row">
+  <label for="show-trails">Motion trails</label>
+  <input type="checkbox" id="show-trails" checked>
+</div>
 
   <div class="btns">
     <button id="btn-play" aria-pressed="true">&#9208; Pause</button>

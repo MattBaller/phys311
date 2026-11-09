@@ -6,6 +6,8 @@ export class Renderer {
     this.cam    = camera;
     this.dpr    = 1;
     this.showTrails = true;
+    this.showForce = false;
+    this.showVelocity = false;
     this.trails = new Map();             // body.id -> array of [x,y]
     this.maxTrail = 160;
     this.reducedMotion = false;
@@ -26,6 +28,47 @@ export class Renderer {
   }
 
   clearTrails() { this.trails.clear(); }
+
+  drawVector(body, vector, color, scale = 1) {
+  const ctx = this.ctx;
+  const cam = this.cam;
+
+  const start = cam.toScreen(body.pos.x, body.pos.y);
+
+  const end = cam.toScreen(
+    body.pos.x + vector.x * scale,
+    body.pos.y + vector.y * scale
+  );
+
+  const dx = end[0] - start[0];
+  const dy = end[1] - start[1];
+
+  const angle = Math.atan2(dy, dx);
+  const head = 8;
+
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.moveTo(...start);
+  ctx.lineTo(...end);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(...end);
+  ctx.lineTo(
+    end[0] - head * Math.cos(angle - Math.PI / 6),
+    end[1] - head * Math.sin(angle - Math.PI / 6)
+  );
+  ctx.lineTo(
+    end[0] - head * Math.cos(angle + Math.PI / 6),
+    end[1] - head * Math.sin(angle + Math.PI / 6)
+  );
+  ctx.closePath();
+  ctx.fill();
+}
+
 
   recordTrails(world) {
     if (!this.showTrails || this.reducedMotion) return;
@@ -76,6 +119,20 @@ export class Renderer {
       if (b === grabbed) { ctx.lineWidth = 3; ctx.strokeStyle = '#ffffff'; ctx.stroke(); }
       else if (b.fixed)  { ctx.lineWidth = 2; ctx.strokeStyle = '#333';    ctx.stroke(); }
     }
+
+// Velocity vectors
+if (this.showVelocity) {
+  for (const b of world.bodies) {
+    this.drawVector(b, b.vel, '#00ccff', 0.1);
+  }
+}
+
+// Force vectors
+if (this.showForce) {
+  for (const b of world.bodies) {
+    this.drawVector(b, b.force, '#ff9f43', 10);
+  }
+}
 
     if (grabbed && target) {
   const b = grabbed;

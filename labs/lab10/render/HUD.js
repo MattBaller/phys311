@@ -12,7 +12,7 @@ export class HUD {
     this._last = now;
   }
 
-  update(world, { substeps = 0, paused = false } = {}) {
+  update(world, { substeps = 0, paused = false, cursor = null } = {}) {
     const dE = world.driftE();
     const dP = world.driftP();
     const bad = Math.abs(dE) > 0.01;
@@ -29,6 +29,8 @@ export class HUD {
       <span class="v ${bad ? 'bad' : 'ok'}">${(dE * 100).toFixed(3)} %</span>
       <span class="k">&Delta;p/p&#8320;</span>
       <span class="v ${badP ? 'bad' : (expectP ? 'ok' : 'na')}" title="${expectP ? 'isolated system: must hold' : 'external forces present: not expected to hold'}">${dP.toExponential(2)}${expectP ? '' : ' n/a'}</span>
+      <span class="k">cursor</span>
+      <span class="v">${cursor ? `x ${cursor[0].toFixed(2)}, y ${cursor[1].toFixed(2)} m` : 'beyond bounds'}</span>
       <span class="k">fps</span><span class="v">${this.fps.toFixed(0)}</span>
       <span class="k">sub/frame</span><span class="v">${substeps}${paused ? ' (paused)' : ''}</span>`;
     // Screen readers: announce only the physics honesty numbers, not fps.

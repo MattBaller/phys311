@@ -6,6 +6,7 @@ import { HUD }          from './render/HUD.js';
 import { Controls }     from './ui.js';
 import { PointerInput } from './input.js';
 import { KeyboardInput } from './input.js';
+import { eventToWorld } from './input.js';
 import { StateURL }     from './ui.js';
 import { SCENES } from './engine/World.js';
 import { Body, Vec2 }   from './engine/World.js';
@@ -15,10 +16,12 @@ const DEFAULTS = {
   integrator: 'verlet',
   dt: 1 / 167,
   restitution: 0.4,
-  gravity: 9.81,
+  G: 1,
   drag: 0.0,
   speed: 1.0,
-  trails: true,
+  showtrails: true,
+  showForce: false,
+  showVelocity: false,
   spawnMode: false
 };
 
@@ -45,7 +48,7 @@ Object.assign(state, {
 });
 
 let world = null, view = null, paused = false, gameWon = false, lastSubsteps = 0;
-let pointer = null, keyboard = null;
+let pointer = null, keyboard = null, cursor = null;
 
 function announce(msg) { live.textContent = msg; }
 
@@ -70,16 +73,28 @@ function build() {
 // Live parameter edits that must NOT restart the simulation.
 function applyLive() {
   if (!world) return;
+
   world.setIntegrator(state.integrator);
   world.DT = state.dt;
   world.restitution = state.restitution;
+
   for (const f of world.forces) {
-    if (f.constructor.name === 'UniformGravity')  f.g = state.gravity;
-    if (f.constructor.name === 'QuadraticDrag')   f.c = state.drag;
+    if (f.constructor.name === 'NewtonGravity') {
+      f.G = state.G;
+    }
+
+    if (f.constructor.name === 'QuadraticDrag') {
+      f.c = state.drag;
+    }
   }
-  render.showTrails = state.trails;
-  if (!state.trails) render.clearTrails();
+
+  render.showForce = state.showForce;
+  render.showVelocity = state.showVelocity;
+  render.showTrails = state.showTrails;
+  if (!state.showTrails) render.clearTrails();
+
   if (pointer) pointer.spawnMode = state.spawnMode;
+
   StateURL.write(state);
 }
 
@@ -110,7 +125,7 @@ stepOnce() {
   announce(`Stepped to t = ${world.time.toFixed(3)} seconds`);
 },
   reset()       { build(); announce('Simulation reset'); },
-  toggleTrails(){ state.trails = !state.trails; controls.syncToDOM(); applyLive(); },
+  toggleTrails(){ state.showTrails = !state.showTrails; controls.syncToDOM(); applyLive(); },
   preset(i)     { const s = SCENE_LIST[i]; if (!s) return;
                   state.scene = s[0]; controls.syncToDOM(); build(); },
   copyLink() {
@@ -128,11 +143,32 @@ const controls = new Controls(state, {
 });
 
 build();
-pointer  = new PointerInput(canvas, cam, world, world.pointer, { onSpawn: spawn });
-keyboard = new KeyboardInput(world, world.pointer, cam, { ...actions, announce });
+
+pointer = new PointerInput(canvas, cam, world, world.pointer, {
+  onSpawn: spawn
+});
+
+keyboard = new KeyboardInput(world, world.pointer, cam, {
+  ...actions,
+  announce
+});
+
 pointer.spawnMode = state.spawnMode;
 
-window.addEventListener('resize', () => { render.resize(); cam.fit(...view); });
+// Track cursor position in physics (world) coordinates.
+canvas.addEventListener('pointermove', event => {
+  cursor = eventToWorld(event, canvas, cam);
+});
+
+canvas.addEventListener('pointerleave', () => {
+  cursor = null;
+});
+
+window.addEventListener('resize', () => {
+  render.resize();
+  cam.fit(...view);
+});
+
 
 // ---- the frame loop: fixed physics step, variable render rate ----
 let last = performance.now();
@@ -161,9 +197,9 @@ function frame(now) {
 
   render.draw(world, {
     grabbed: world.pointer.grabbed,
-    target : world.pointer.active ? world.pointer.target : null
+    target : world.pointer.active ? world.pointer.target : null, cursor
   });
-  hud.update(world, { substeps: lastSubsteps, paused });
+  hud.update(world, { substeps: lastSubsteps, paused, cursor });
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
