@@ -1,5 +1,14 @@
 # Physics 311 Journal
 
+## November 15, 2026
+
+### Week 12
+
+I chose to create a game for this project. I think this type of project is the most motivating for me, where testing/playing the game and it behaving correctly serves as a direct reward for writing the code itself. I grew up loving video games and the creativity that comes with making games go beyond the physics and scripts, where you can create what your game looks like and rules about it and then implement it later. My biggest fear is that energy and momentum must truly be conserved even in a game. Many games will break the laws of physics just to have certain aspects of it work for convenience. It will be challenging to keep the physics more consistent with reality, with some workarounds or changes needing to be necessary for the game to play as intended.
+
+
+# Physics 311 Journal
+
 ## November 8, 2026
 
 ### Week 11
