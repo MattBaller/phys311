@@ -25,7 +25,7 @@ export class Controls {
      s.integrator = e.target.value;
       this.onRebuild();
     });
-
+    
     // Timestep slider
     this.$('dt')?.addEventListener('input', e => {
       s.dt = parseFloat(e.target.value);
@@ -87,6 +87,22 @@ for (const [id, key] of [
     if (integrator) {
       integrator.value = this.state.integrator;
     }
+    
+// Timestep and simulation speed
+    for (const [id, key, precision, suffix] of [
+      ['dt', 'dt', 3, ' s'],
+      ['speed', 'speed', 2, '×']
+    ]) {
+      const slider = this.$(id);
+      const output = this.$(`${id}-out`);
+
+      if (slider) slider.value = this.state[key];
+
+      if (output) {
+        output.textContent =
+          this.state[key].toFixed(precision) + suffix;
+      }
+    }
 
     for (const [id, key] of [
   ['show-force', 'showForce'],
@@ -139,7 +155,8 @@ export const StateURL = {
     p.set('G',     String(s.G));
     p.set('drag',  String(s.drag));
     p.set('speed', String(s.speed));
-    p.set('n',     String(s.count));
+    for (const k of ['showTrails', 'showForce', 'showVelocity', 'spawnMode'])
+      if (typeof s[k] === 'boolean') p.set(k, String(s[k]));
     return '#' + p.toString();
   },
 
@@ -147,7 +164,7 @@ export const StateURL = {
     const p = new URLSearchParams((hash || '').replace(/^#/, ''));
     const num = (k, d) => {
       const v = parseFloat(p.get(k));
-      return Number.isFinite(v) ? v : d;
+      return Number.isFinite(v) && (k !== 'dt' || v > 0) && (k !== 'speed' || v >= 0) ? v : d;
     };
     return {
       scene:       p.get('scene') || defaults.scene,
@@ -157,7 +174,7 @@ export const StateURL = {
       G:           num('G', defaults.G),
       drag:        num('drag',  defaults.drag),
       speed:       num('speed', defaults.speed),
-      count:       Math.round(num('n', defaults.count))
+      ...Object.fromEntries(['showTrails', 'showForce', 'showVelocity', 'spawnMode'].map(k => [k, p.get(k) === 'true' ? true : p.get(k) === 'false' ? false : defaults[k]]))
     };
   },
 

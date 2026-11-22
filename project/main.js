@@ -12,14 +12,14 @@ import { SCENES } from './engine/World.js';
 import { Body, Vec2 }   from './engine/World.js';
 
 const DEFAULTS = {
-  scene: 'spaceLauncher',
+  scene: 'traditionalLauncher',
   integrator: 'verlet',
   dt: 1 / 167,
   restitution: 0.4,
   G: 1,
   drag: 0.0,
   speed: 1.0,
-  showtrails: true,
+  showTrails: true,
   showForce: false,
   showVelocity: false,
   spawnMode: false
@@ -38,26 +38,20 @@ render.reducedMotion =
 // ---- state: URL hash wins over defaults, so a shared link reproduces a run ----
 const state = { ...DEFAULTS, ...StateURL.decode(location.hash, DEFAULTS) };
 
-// Keep physics parameters fixed regardless of URL settings.
-Object.assign(state, {
-  dt: 1 / 167,
-  gravity: 9.81,
-  restitution: 0.4,
-  drag: 0.0,
-  speed: 1.0
-});
-
 let world = null, view = null, paused = false, gameWon = false, lastSubsteps = 0;
 let pointer = null, keyboard = null, cursor = null;
 
 function announce(msg) { live.textContent = msg; }
 
 function build() {
-  const made = SCENES[state.scene] ? SCENES[state.scene](state) : SCENES.billiards(state);
+  const made = SCENES[state.scene] ? SCENES[state.scene](state) : SCENES.traditionalLauncher(state);
   gameWon = false;
   document.getElementById('win-message').style.display = 'none';
   world = made.world; view = made.view;
   world.setIntegrator(state.integrator);
+  render.showForce = state.showForce;
+  render.showVelocity = state.showVelocity;
+  render.showTrails = state.showTrails;
   render.clearTrails();
   render.resize();
   cam.fit(...view);
@@ -76,11 +70,11 @@ function applyLive() {
 
   world.setIntegrator(state.integrator);
   world.DT = state.dt;
-  world.restitution = state.restitution;
+  world.restitution = state.scene.startsWith('conservative') ? 1 : state.restitution;
 
   for (const f of world.forces) {
     if (f.constructor.name === 'NewtonGravity') {
-      f.G = state.G;
+      if (!state.scene.startsWith('conservative')) f.G = state.G;
     }
 
     if (f.constructor.name === 'QuadraticDrag') {
@@ -126,8 +120,7 @@ stepOnce() {
 },
   reset()       { build(); announce('Simulation reset'); },
   toggleTrails(){ state.showTrails = !state.showTrails; controls.syncToDOM(); applyLive(); },
-  preset(i)     { const s = SCENE_LIST[i]; if (!s) return;
-                  state.scene = s[0]; controls.syncToDOM(); build(); },
+
   copyLink() {
     const url = location.origin + location.pathname + StateURL.encode(state);
     navigator.clipboard?.writeText(url)
@@ -179,7 +172,7 @@ function frame(now) {
   if (!Number.isFinite(dtFrame) || dtFrame < 0) dtFrame = 0;
 
   if (!paused && !gameWon) {
-    const r = world.advance(dtFrame * state.speed, 32);
+    const r = world.advance(dtFrame * state.speed, 64);
     lastSubsteps = r.substeps;
     render.recordTrails(world);
 

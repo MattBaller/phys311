@@ -4,7 +4,8 @@ import { Vec2 } from './Vec2.js';
 let _nextId = 1;
 
 export class Body {
-  constructor({ pos, vel = Vec2.zero(), mass = 1, radius = 0.25,
+  constructor({ pos, vel = Vec2.zero(), shape = 'circle', width = 1.0, 
+                height = 1.0, angle = 0, omega = 0, mass = 1, radius = 0.25,
                 fixed = false, locked = false, breakable = false, defeated = false,
                 breakThreshold = 8, color = '#ff8200', tag = '' } = {}) {
     this.id      = _nextId++;
@@ -24,13 +25,39 @@ export class Body {
     this.breakThreshold = breakThreshold;
     this.destroyed = false;
     this.defeated = false;
+    this.shape = shape;
+    this.width = width;
+    this.height = height;
+
+    this.angle = angle;
+    this.omega = omega;
+
+    this.alpha = 0;
+    this.torque = 0;
+
+// Moment of inertia about the center of mass
+if (shape === 'rectangle') {
+  this.I = mass * (width ** 2 + height ** 2) / 12;
+} else {
+  this.I = 0.5 * mass * radius ** 2;
+}
+
+this.invI = fixed ? 0 : 1 / this.I;
     
   }
 
   clearForce()      { this.force.set(0, 0); }
   applyForce(F)     { this.force.addTo(F); }
 
-  kinetic()         { return 0.5 * this.mass * this.vel.len2(); }
+  kinetic() {
+  const KE_linear =
+    0.5 * this.mass * this.vel.len2();
+
+  const KE_rotational =
+    0.5 * this.I * this.omega ** 2;
+
+  return KE_linear + KE_rotational;
+}
   momentum()        { return this.vel.mul(this.mass); }
 
   static resetIds() { _nextId = 1; }

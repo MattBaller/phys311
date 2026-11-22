@@ -45,6 +45,31 @@ export class QuadraticDrag {
   }
 }
 
+
+// Contact law used by the collision solver, not by accumulateForces().
+export class ContactFriction {
+  constructor(muStatic = 0.6, muKinetic = 0.4, rolling = 0) {
+    this.rolling = Math.max(0, rolling);
+    this.muStatic = Math.max(0, muStatic);
+    this.muKinetic = Math.min(this.muStatic, Math.max(0, muKinetic));
+    this.enabled = true;
+  }
+
+  // Angular impulse opposing relative rotation, capped by normal load.
+  rollingImpulse(relativeOmega, jn, invInertiaSum, radius) {
+    if (!this.enabled || invInertiaSum <= 0 || jn <= 0) return 0;
+    return -Math.sign(relativeOmega) * Math.min(
+      Math.abs(relativeOmega) / invInertiaSum, this.rolling * radius * jn);
+  }
+
+  impulse(vt, jn, denominator) {
+    if (!this.enabled || denominator <= 0 || jn <= 0) return 0;
+    const jt = -vt / denominator;
+    if (Math.abs(jt) <= this.muStatic * jn) return jt;
+    return -Math.sign(vt) * Math.min(Math.abs(jt), this.muKinetic * jn);
+  }
+}
+
 export class Spring {
   // Hookean link between two bodies. Equal and opposite by construction.
   constructor(a, b, k = 40, rest = 1, damp = 0) {
@@ -115,16 +140,24 @@ export class PointerSpring {
   get active()               { return this.enabled && this.grabbed !== null; }
 
   apply() {
-    if (!this.active || this.slingshotMode) return;
-    if (!this.active) return;
-    const b = this.grabbed;
-    if (b.fixed) return;
-    const d = this.target.sub(b.pos);
-    const F = d.mul(this.k).sub(b.vel.mul(this.damp));
-    b.applyForce(F);
-  }
+  if (!this.active || this.slingshotMode) return;
+
+  const b = this.grabbed;
+
+  if (b.fixed || b.locked) return;
+
+  const d = this.target.sub(b.pos);
+
+  const F = d.mul(this.k)
+             .sub(b.vel.mul(this.damp));
+
+  b.applyForce(F);
+}
+
   energy() {
-    if (!this.active) return 0;
-    return 0.5 * this.k * this.target.sub(this.grabbed.pos).len2();
+    if (!this.active || this.slingshotMode) return 0;
+
+    return 0.5 * this.k *
+      this.target.sub(this.grabbed.pos).len2();
   }
 }

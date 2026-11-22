@@ -110,15 +110,74 @@ export class Renderer {
         ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
       }
 
-    for (const b of world.bodies) {
-      const [px, py] = cam.toScreen(b.pos.x, b.pos.y);
-      const r = Math.max(2.5, b.radius * cam.scale);
-      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.fillStyle = b.defeated ? '#555555' : b.color;
-      ctx.fill();
-      if (b === grabbed) { ctx.lineWidth = 3; ctx.strokeStyle = '#ffffff'; ctx.stroke(); }
-      else if (b.fixed)  { ctx.lineWidth = 2; ctx.strokeStyle = '#333';    ctx.stroke(); }
-    }
+    
+// ---------- Draw bodies ----------
+
+for (const b of world.bodies) {
+
+  const [px, py] = cam.toScreen(b.pos.x, b.pos.y);
+
+  ctx.save();
+
+  // Move drawing origin to center of mass
+  ctx.translate(px, py);
+
+  ctx.fillStyle = b.defeated ? '#555555' : b.color;
+
+  ctx.beginPath();
+
+  if (b.shape === 'rectangle') {
+
+    // Rotate rectangle to its current orientation
+    ctx.rotate(-(b.angle ?? 0));
+
+    // Convert dimensions from meters to pixels
+    const width = b.width * cam.scale;
+    const height = b.height * cam.scale;
+
+    // Rectangle centered at its center of mass
+    ctx.rect(
+      -width / 2,
+      -height / 2,
+      width,
+      height
+    );
+
+  } else {
+
+    // Original circular bodies
+    const r = Math.max(2.5, b.radius * cam.scale);
+
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+  }
+
+  // Fill body
+  ctx.fill();
+
+  // Body outlines
+  if (b === grabbed) {
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+
+  } else if (b.fixed) {
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#333333';
+    ctx.stroke();
+
+  } else if (b.shape === 'rectangle') {
+
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#654321';
+    ctx.stroke();
+  }
+
+  // Restore original drawing coordinates
+  ctx.restore();
+}
+
 
 // Velocity vectors
 if (this.showVelocity) {
@@ -134,16 +193,24 @@ if (this.showForce) {
   }
 }
 
-    if (grabbed && target) {
+  
+if (grabbed && target) {
   const b = grabbed;
 
-  // Calculate launch velocity from the current pull distance
+  // Calculate launch velocity
   const dx = b.pos.x - target.x;
   const dy = b.pos.y - target.y;
 
   const launchScale = 0.3;
   const vx = dx * launchScale;
   const vy = dy * launchScale;
+
+  // Determine gravitational acceleration
+  const gravity = world.forces.find(
+    f => f.constructor.name === 'UniformGravity'
+  );
+
+  const gravityY = gravity ? -gravity.g : 0;
 
   // Predict trajectory
   const points = [];
@@ -158,15 +225,17 @@ if (this.showForce) {
   for (let i = 0; i < steps; i++) {
     points.push(cam.toScreen(x, y));
 
-    // Simple gravitational acceleration
-    const ax = 0;
-    const ay = 0;
-
-    velX += ax * dt;
-    velY += ay * dt;
-
+    // Update position
     x += velX * dt;
-    y += velY * dt;
+    y += velY * dt + 0.5 * gravityY * dt ** 2;
+
+    // Update velocity
+    velY += gravityY * dt;
+
+    // Stop trajectory at the ground
+    if (world.bounds && y < world.bounds.ymin) {
+      break;
+    }
   }
 
   // Draw predicted trajectory
@@ -176,13 +245,16 @@ if (this.showForce) {
   ctx.lineWidth = 2;
 
   ctx.beginPath();
+
   points.forEach(([sx, sy], i) => {
     if (i === 0) ctx.moveTo(sx, sy);
     else ctx.lineTo(sx, sy);
   });
+
   ctx.stroke();
   ctx.restore();
 }
+
   }
 
   _grid(world) {
