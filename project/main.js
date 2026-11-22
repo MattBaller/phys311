@@ -44,7 +44,13 @@ let pointer = null, keyboard = null, cursor = null;
 function announce(msg) { live.textContent = msg; }
 
 function build() {
-  const made = SCENES[state.scene] ? SCENES[state.scene](state) : SCENES.traditionalLauncher(state);
+  if (!Object.hasOwn(SCENES, state.scene) || typeof SCENES[state.scene] !== 'function') {
+    state.scene = DEFAULTS.scene;
+  }
+  controls.syncToDOM();
+  const made = SCENES[state.scene](state);
+  lastSubsteps = 0;
+  cursor = null;
   gameWon = false;
   document.getElementById('win-message').style.display = 'none';
   world = made.world; view = made.view;

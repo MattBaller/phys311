@@ -18,11 +18,25 @@ export class HUD {
     const bad = Math.abs(dE) > 0.01;
     const expectP = world.momentumConserved && !(world.pointer && world.pointer.active);
     const badP = expectP && dP > 1e-6;
+    // Track the grabbed projectile, otherwise the most recently unlocked
+    // projectile in launch order. In test mode track the first movable body.
+    const projectiles = world.bodies.filter(b => b.tag === 'projectile' && !b.destroyed);
+    const grabbed = world.pointer?.grabbed;
+    const tracked = projectiles.includes(grabbed) ? grabbed
+      : [...projectiles].reverse().find(b => !b.locked)
+        ?? projectiles[0] ?? world.bodies.find(b => !b.fixed && !b.destroyed);
+    const position = tracked ? `(${tracked.pos.x.toFixed(3)}, ${tracked.pos.y.toFixed(3)}) LU` : 'n/a';
+    const speed = tracked ? `${Math.hypot(tracked.vel.x, tracked.vel.y).toFixed(3)} LU/s` : 'n/a';
+    const bodyLabel = tracked ? (projectiles.includes(tracked)
+      ? `projectile ${projectiles.indexOf(tracked) + 1}` : 'first movable body') : 'no body';
     this.el.innerHTML = `
-      <span class="k">t</span><span class="v">${world.time.toFixed(2)} s</span>
+      <span class="k">t</span><span class="v">${world.time.toFixed(3)} s</span>
       <span class="k">steps</span><span class="v">${world.steps}</span>
       <span class="k">bodies</span><span class="v">${world.bodies.length}</span>
+      <span class="k" title="${bodyLabel}">Position</span><span class="v" title="${bodyLabel}">${position}</span>
+      <span class="k" title="${bodyLabel}">Speed</span><span class="v" title="${bodyLabel}">${speed}</span>
       <span class="k">KE</span><span class="v">${world.kinetic().toFixed(3)} J</span>
+      <span class="k">PE</span><span class="v">${world.potential().toFixed(3)} J</span>
       <span class="k">E mech</span><span class="v">${world.mechanical().toFixed(3)} J</span>
       <span class="k">E lost</span><span class="v">${(world.inelastic + world.dissipated).toFixed(3)} J</span>
       <span class="k">&Delta;E/E&#8320;</span>

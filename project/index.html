@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Week 10 Reference — Interactive Physics Simulation</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:,">
 </head>
 <body>
 
@@ -30,6 +31,18 @@
 
   
 <aside class="panel" aria-label="Simulation controls">
+
+  <h2>Level Selection</h2>
+  <div class="row">
+    <label for="scene">Level</label>
+    <select id="scene">
+      <option value="traditionalLauncher" selected>Level 1 — Traditional Launcher</option>
+      <option value="spaceLauncher">Level 2 — Space Launcher</option>
+      <option value="conservativeLauncher">Level 3 — Conservative Launcher</option>
+      <option value="conservative">Conservative Test Mode</option>
+    </select>
+  </div>
+
 
   <div class="row">
     <label for="dt">Timestep <output id="dt-out"></output></label>

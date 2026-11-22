@@ -20,6 +20,13 @@ export class Controls {
     const s = this.state;
 
 
+    // Level selector: rebuild only when the selected scene changes.
+    this.$('scene')?.addEventListener('change', e => {
+      if (s.scene === e.target.value) return;
+      s.scene = e.target.value;
+      this.onRebuild();
+    });
+
     // Integrator selector
     this.$('integrator')?.addEventListener('change', e => {
      s.integrator = e.target.value;
@@ -82,6 +89,9 @@ for (const [id, key] of [
 
   // Synchronize the selected integrator with the simulation state.
   syncToDOM() {
+    const scene = this.$('scene');
+    if (scene) scene.value = this.state.scene;
+
     const integrator = this.$('integrator');
 
     if (integrator) {
