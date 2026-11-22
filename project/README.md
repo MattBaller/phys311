@@ -91,3 +91,21 @@ A passing validation script is evidence that the tested cases behave as expected
 ---
 
 *Physics 311 — Computational Mechanics.*
+
+
+## PHYS311 Final Project — Physics-Based Projectile Launcher
+
+An interactive physics-based projectile game demonstrating
+projectile motion, gravitational interactions, rigid-body
+collisions, rotational dynamics, and conservation laws.
+
+### [Play the Simulation](https://mattballer.github.io/phys311/project/)
+
+### Project Documentation
+
+- [Project README](project/README.md)
+- [Validation Report](project/VALIDATION.md)
+- [Implementation Decisions](project/DECISIONS.md)
+- [Automated Validation Results](project/validation_results.txt)
+
+**Validation Status: 28 passed, 0 failed.**
