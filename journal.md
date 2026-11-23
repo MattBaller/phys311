@@ -1,5 +1,14 @@
 # Physics 311 Journal
 
+## November 22, 2026
+
+### Week 13
+
+I accomplished a lot on this project. I decided to first not use Newtownian gravity in the game since it was very messy to actually keep stationary objects fixed. I included a couple more forces: friction force and rolling resistance, which kept the physics of the objects more realistic. I was having issues with collisions of structures in the levels, which would experience thousands of collisions and cause the entire system to shift after <60 seconds. I feel like I am close to a final submission, I worked around a lot of the physics issues which would appear during the level and I only have minor tweaks to make at this stage.
+
+
+# Physics 311 Journal
+
 ## November 15, 2026
 
 ### Week 12
